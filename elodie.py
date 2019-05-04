@@ -5,6 +5,12 @@ import os
 import re
 import sys
 from datetime import datetime
+import logging
+
+
+import time
+from watchdog.observers import Observer 
+from watchdog.events import FileSystemEventHandler
 
 import click
 from send2trash import send2trash
@@ -31,6 +37,7 @@ from elodie.result import Result
 
 
 FILESYSTEM = FileSystem()
+OPTIONS = {}
 
 
 def import_file(_file, destination, album_from_folder, trash, allow_duplicates):
@@ -121,6 +128,50 @@ def _import(destination, source, file, album_from_folder, trash, allow_duplicate
     if has_errors:
         sys.exit(1)
 
+
+@click.command('watch')
+@click.option('--destination', type=click.Path(file_okay=False),
+              required=True, help='Copy imported files into this directory.')
+@click.option('--album-from-folder', default=False, is_flag=True,
+              help="Use images' folders as their album names.")
+@click.option('--trash', default=False, is_flag=True,
+              help='After copying files, move the old files to the trash.')
+@click.option('--allow-duplicates', default=False, is_flag=True,
+              help='Import the file even if it\'s already been imported.')
+@click.option('--debug', default=False, is_flag=True,
+              help='Override the value in constants.py with True.')
+@click.option('--path', type=click.Path(file_okay=False),required=True)
+def _watch(destination,album_from_folder,trash,allow_duplicates,debug,path):
+    
+    """Watch directory and import files or directories by reading their EXIF and organizing them accordingly.
+    """
+    
+    constants.debug = debug
+
+    destination = _decode(destination)
+    destination = os.path.abspath(os.path.expanduser(destination))
+
+    
+    OPTIONS['destination'] = destination
+    if album_from_folder:
+        OPTIONS['album_from_folder']=album_from_folder
+    if trash:
+        OPTIONS['trash']=trash
+    if allow_duplicates:
+        OPTIONS['allow_duplicates']=allow_duplicates
+    if debug:
+        OPTIONS['debug']=debug
+
+    path = os.path.abspath(os.path.expanduser(path))
+    print(path)
+
+    if os.path.isdir(path):
+        w = Watcher(path,OPTIONS)
+        w.run()
+
+    else:
+        print("%s is not a directory"%(path))
+        logging.warning("%s is not a directory"%(path))
 
 @click.command('generate-db')
 @click.option('--source', type=click.Path(file_okay=False),
@@ -329,16 +380,76 @@ def _update(album, location, time, title, paths, debug):
     if has_errors:
         sys.exit(1)
 
+def run():
+    event_handler = Handler()
+    self
+class Watcher:
+    
+
+    def __init__(self,directory,options):
+        self.observer = Observer()
+        self.DIRECTORY_TO_WATCH = directory
+        logging.info("Watching %s" %(self.DIRECTORY_TO_WATCH))
+        #destination, source, file, album_from_folder, trash, allow_duplicates, debug, paths
+        self.options = options
+
+    def run(self):
+        if os.path.isdir(self.DIRECTORY_TO_WATCH):
+            event_handler = Handler()
+            self.observer.schedule(event_handler,self.DIRECTORY_TO_WATCH, recursive = True)
+            self.observer.start()
+        else:
+            logging.warning("Directory %s is not valid" %(self.DIRECTORY_TO_WATCH))
+        try:
+            while True:
+                time.sleep(5)
+        except:
+            self.observer.stop()
+            #print ("error")
+            logging.warning("Observer through an error.")
+
+        self.observer.join()
+
+
+class Handler(FileSystemEventHandler):
+    
+
+    @staticmethod
+    def on_any_event(event):
+        if event.is_directory:
+            return None
+        
+        elif event.event_type == 'created':
+            #print ("Recieved created event - %s" % event.src_path)
+            logging.info("Recieved created event - %s" % event.src_path)
+           
+
+            dest_path = import_file(event.src_path, OPTIONS.get('destination'), OPTIONS.get('album_from_folder'),
+                    OPTIONS.get('trash'), OPTIONS.get('allow_duplicates'))
+            #print (dest_path)
+           
+            #result.append((event.src_path, dest_path))
+            #has_errors = has_errors is True or not dest_path
+
+
+
+        elif event.event_type == 'modified':
+            print ("Recieved modified event - %s." % event.src_path)
 
 @click.group()
 def main():
-    pass
+
+    logging.basicConfig(filename='elodie_watch.log', level=logging.INFO, format='%(asctime)s %(message)s')
+    logging.info('Started')
 
 
 main.add_command(_import)
 main.add_command(_update)
 main.add_command(_generate_db)
 main.add_command(_verify)
+main.add_command(_watch)
+
+
 
 
 if __name__ == '__main__':

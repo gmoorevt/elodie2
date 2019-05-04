@@ -1,0 +1,28 @@
+2018-10-30 15:20:59,200 Started
+2018-10-30 15:20:59,201 Watching /Users/gmoore/dev/watch
+2018-10-30 15:21:00,166 Observer through an error.
+2018-10-30 15:21:00,255 /Users/gmoore/dev/watch is not a directory
+2019-05-04 11:35:42,142 Started
+2019-05-04 11:56:38,465 Started
+2019-05-04 11:56:48,171 Started
+2019-05-04 11:56:58,528 Started
+2019-05-04 11:56:58,528 paths=/Users/gmoore/watch/ is not a directory
+2019-05-04 11:57:20,831 Started
+2019-05-04 11:57:20,831 paths=/Users/gmoore/watch/ is not a directory
+2019-05-04 11:59:03,144 Started
+2019-05-04 11:59:03,145 paths=["/Users/gmoore/watch/"] is not a directory
+2019-05-04 12:01:20,173 Started
+2019-05-04 12:03:05,119 Started
+2019-05-04 12:03:58,992 Started
+2019-05-04 12:05:35,726 Started
+2019-05-04 12:14:05,782 Started
+2019-05-04 12:14:26,887 Started
+2019-05-04 12:14:26,888 Watching /Users/gmoore/watch
+2019-05-04 12:15:51,724 Recieved created event - /Users/gmoore/watch/11-6-2010/.picasa.ini
+2019-05-04 12:15:56,718 Recieved created event - /Users/gmoore/watch/.DS_Store
+2019-05-04 12:16:44,848 Recieved created event - /Users/gmoore/watch/2015-04-Apr/Unknown Location/2015-04-23_03-27-11-fullsizeoutput_532.jpeg
+2019-05-04 12:19:45,774 Recieved created event - /Users/gmoore/watch/2006 02 14 001.JPG
+2019-05-04 12:19:47,137 Recieved created event - /Users/gmoore/watch/2006 02 14 003.JPG
+2019-05-04 12:19:48,485 Recieved created event - /Users/gmoore/watch/2006 02 14 001.JPG
+2019-05-04 12:19:49,571 Recieved created event - /Users/gmoore/watch/2006 02 14 003.JPG
+2019-05-04 12:20:57,567 Observer through an error.
